@@ -249,6 +249,8 @@ main { padding: 0 clamp(16px, 6vw, 96px); }
 /* render the site at 2.5x the box width, then scale down so it looks like a desktop view */
 .live-view iframe { position: absolute; top: 0; left: 0; width: 250%; height: 250%; border: 0; transform: scale(.4); transform-origin: 0 0; pointer-events: none; }
 .live-view img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.live-view .shot-light, :root[data-theme="light"] .live-view .shot-dark { display: none; }
+:root[data-theme="light"] .live-view .shot-light { display: block; }
 .live-open { position: absolute; inset: 0; display: grid; place-items: center; font: 600 .85rem var(--mono); color: #fff;
   background: rgba(10, 12, 22, .55); opacity: 0; transition: opacity .3s; }
 .live:hover .live-open, .live:focus-visible .live-open { opacity: 1; }

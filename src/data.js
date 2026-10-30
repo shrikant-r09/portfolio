@@ -27,7 +27,7 @@ export const projects = [
     kind: 'Final-year major project · FastAPI',
     // shows the screenshot until the site's headers allow framing, then the live site (see TEXT_TO_SQL_PREVIEW.md)
     embed: 'https://g52-web.vercel.app/',
-    shot: '/previews/text-to-sql.jpg',
+    shot: { light: '/previews/text-to-sql-light.jpg', dark: '/previews/text-to-sql-dark.jpg' }, // follows the portfolio theme
     stack: ['Python', 'FastAPI', 'SQL', 'NLP', 'LLMs'],
     points: [
       'Turns plain-English questions into SQL so non-technical users can query a database without writing code.',
@@ -40,7 +40,6 @@ export const projects = [
   {
     name: 'Plane+: Time Tracking & AI Search',
     kind: 'Open-source extension · Django + React',
-    embed: 'https://prathamesh250205.github.io/plane-time-tracking-search/demo/',
     stack: ['Python', 'Django', 'TypeScript', 'React', 'PostgreSQL', 'Docker', 'ONNX', 'Semantic search', 'GitHub Actions'],
     points: [
       'Extended Plane, a large open-source Jira alternative (Django + React monorepo), with per-task time tracking and a person × day timesheet.',

@@ -200,7 +200,7 @@ function LivePreview({ p, live }) {
       <div className="live-view">
         {live
           ? <iframe src={p.embed} title={`${p.name} live preview`} loading="lazy" tabIndex={-1} scrolling="no" />
-          : <img src={p.shot} alt={`${p.name} homepage`} loading="lazy" />}
+          : ['light', 'dark'].map(t => <img key={t} className={`shot-${t}`} src={p.shot[t]} alt={`${p.name} homepage`} loading="lazy" />)}
         <span className="live-open">Open live site ↗</span>
       </div>
     </motion.a>
