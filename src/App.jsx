@@ -160,6 +160,32 @@ function Landing({ onEnter }) {
   );
 }
 
+// Cut-out portrait that fades out at the bottom, framed by HUD corners and floating info chips.
+const bob = (d, dur = 5) => ({ animate: { y: [0, -8, 0] }, transition: { duration: dur, repeat: Infinity, ease: 'easeInOut', delay: d } });
+
+function Portrait() {
+  return (
+    <motion.div className="portrait" initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} transition={{ duration: 1, delay: 0.3, ease }}>
+      <div className="portrait-glow" />
+      <span className="hud tl" /><span className="hud tr" />
+      <img src="/img/portrait.webp" alt="Shrikant Rathod" width="900" height="856" />
+      <div className="scan" aria-hidden="true" />
+
+      <motion.div className="chip c1" {...bob(0)}><span className="dot" /> Open to work</motion.div>
+      <motion.div className="chip c2" {...bob(1.2, 6)}><b>{'{ }'}</b> MERN · FastAPI</motion.div>
+      <motion.div className="chip c3" {...bob(2.1, 5.5)}><b>⌖</b> Kolhapur, IN</motion.div>
+      <motion.div className="term" {...bob(0.6, 7)} aria-hidden="true">
+        <p><i>$</i> whoami</p>
+        <p>shrikant.rathod</p>
+        <p><i>role</i> full-stack dev</p>
+        <p><i>grad</i> 2027 · CSE</p>
+        <p><i>status</i> shipping<span className="caret">_</span></p>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 // Live, scaled-down view of the deployed site in a browser frame. Click opens the real site.
 function LivePreview({ p }) {
   return (
@@ -316,6 +342,7 @@ function Site({ onHome }) {
       exit={{ opacity: 0, transition: { duration: 0.3 } }}>
       <Nav onHome={onHome} />
       <section className="intro" data-scene="sphere">
+        <div className="intro-text">
         <motion.p className="eyebrow" {...reveal}>// who I am</motion.p>
         <motion.h2 {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
           Full-stack developer who <em>ships.</em>
@@ -329,6 +356,8 @@ function Site({ onHome }) {
           <a className="btn" href="/Shrikant_Rathod_CV_FullStack.pdf" download>CV — Full-Stack ↓</a>
           <a className="btn ghost" href="/Shrikant_Rathod_CV_DataAnalyst.pdf" download>CV — Data Analyst ↓</a>
         </motion.div>
+        </div>
+        <Portrait />
       </section>
       <div className="marquee"><LogoRow items={featured} /></div>
       <main>
