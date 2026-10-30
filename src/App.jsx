@@ -186,18 +186,21 @@ function Portrait() {
   );
 }
 
-// Live, scaled-down view of the deployed site in a browser frame. Click opens the real site.
-function LivePreview({ p }) {
+// Live, scaled-down view of the deployed site in a browser frame (or its screenshot when the site blocks framing).
+// Click opens the real site.
+function LivePreview({ p, live }) {
   return (
     <motion.a className="live" href={p.live} target="_blank" rel="noopener"
       whileHover={{ y: -6 }} transition={{ duration: 0.4, ease }} aria-label={`Open ${p.name} live`}>
       <div className="live-bar">
         <i /><i /><i />
         <span>{(p.embed || p.live).replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
-        <b className="live-badge">● Live</b>
+        {live && <b className="live-badge">● Live</b>}
       </div>
       <div className="live-view">
-        <iframe src={p.embed} title={`${p.name} live preview`} loading="lazy" tabIndex={-1} scrolling="no" />
+        {live
+          ? <iframe src={p.embed} title={`${p.name} live preview`} loading="lazy" tabIndex={-1} scrolling="no" />
+          : <img src={p.shot} alt={`${p.name} homepage`} loading="lazy" />}
         <span className="live-open">Open live site ↗</span>
       </div>
     </motion.a>
@@ -216,14 +219,15 @@ function useFrameable(url) {
 }
 
 function Project({ p, i }) {
-  const showPreview = useFrameable(p.embed) === true;
+  const live = useFrameable(p.embed) === true;
+  const showPreview = live || !!p.shot;
   return (
     <motion.article className={`project ${showPreview ? '' : 'solo'}`} {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
       <div className="project-meta">
         <span className="idx">P-{String(i + 1).padStart(2, '0')}</span>
         <span>{p.kind}</span>
       </div>
-      {showPreview && <LivePreview p={p} />}
+      {showPreview && <LivePreview p={p} live={live} />}
       <div className="project-body">
         <h3>{p.name}</h3>
         <ul>{p.points.map(pt => <li key={pt}>{pt}</li>)}</ul>

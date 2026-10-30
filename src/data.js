@@ -25,8 +25,9 @@ export const projects = [
   {
     name: 'AI Text-to-SQL System',
     kind: 'Final-year major project · FastAPI',
-    // preview appears by itself once this site's headers allow framing (see TEXT_TO_SQL_PREVIEW.md)
+    // shows the screenshot until the site's headers allow framing, then the live site (see TEXT_TO_SQL_PREVIEW.md)
     embed: 'https://g52-web.vercel.app/',
+    shot: '/previews/text-to-sql.jpg',
     stack: ['Python', 'FastAPI', 'SQL', 'NLP', 'LLMs'],
     points: [
       'Turns plain-English questions into SQL so non-technical users can query a database without writing code.',
