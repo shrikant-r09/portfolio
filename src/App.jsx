@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView, useScroll, useSpring } from 'framer-motion';
 import { contact, projects, skills, certs, leadership } from './data.js';
 import Background from './Background.jsx';
@@ -204,14 +204,26 @@ function LivePreview({ p }) {
   );
 }
 
+// Asks our API whether the site's headers allow framing; null while checking.
+function useFrameable(url) {
+  const [ok, setOk] = useState(url ? null : false);
+  useEffect(() => {
+    if (!url) return;
+    fetch(`/api/frameable?url=${encodeURIComponent(url)}`)
+      .then(r => r.json()).then(d => setOk(!!d.ok)).catch(() => setOk(false));
+  }, [url]);
+  return ok;
+}
+
 function Project({ p, i }) {
+  const showPreview = useFrameable(p.embed) === true;
   return (
-    <motion.article className={`project ${p.embed ? '' : 'solo'}`} {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
+    <motion.article className={`project ${showPreview ? '' : 'solo'}`} {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
       <div className="project-meta">
         <span className="idx">P-{String(i + 1).padStart(2, '0')}</span>
         <span>{p.kind}</span>
       </div>
-      {p.embed && <LivePreview p={p} />}
+      {showPreview && <LivePreview p={p} />}
       <div className="project-body">
         <h3>{p.name}</h3>
         <ul>{p.points.map(pt => <li key={pt}>{pt}</li>)}</ul>

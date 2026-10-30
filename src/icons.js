@@ -2,6 +2,7 @@ import {
   SiJavascript, SiTypescript, SiPython, SiReact, SiHtml5, SiCss, SiFramer, SiNodedotjs, SiExpress,
   SiFastapi, SiJsonwebtokens, SiGoogle, SiMongodb, SiGooglegemini, SiGit, SiGithub, SiDocker,
   SiVercel, SiRazorpay, SiPandas, SiNumpy, SiScikitlearn, SiFlutter, SiDart, SiMysql,
+  SiDjango, SiPostgresql, SiOnnx, SiGithubactions,
 } from 'react-icons/si';
 import {
   TbApi, TbGauge, TbDatabaseSearch, TbBrain, TbScan, TbMessageCode, TbPlugConnected,
@@ -24,6 +25,8 @@ const icons = {
   Pandas: [SiPandas, '#E70488'], NumPy: [SiNumpy, '#4DABCF'], Matplotlib: [TbChartLine, '#11557C'], 'Scikit-learn': [SiScikitlearn, '#F7931E'],
   Tableau: [TbChartBar, '#E97627'], Excel: [TbFileSpreadsheet, '#217346'], 'Power BI': [TbChartPie, '#F2C811'],
   Flutter: [SiFlutter, '#02569B'], Dart: [SiDart, '#0175C2'],
+  Django: [SiDjango, '#44B78B'], PostgreSQL: [SiPostgresql, '#4169E1'], ONNX: [SiOnnx, null], 'GitHub Actions': [SiGithubactions, '#2088FF'],
+  'Semantic search': [TbDatabaseSearch, '#00ED64'],
 };
 
 export const iconFor = name => icons[name] || [TbCode, null];

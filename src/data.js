@@ -25,7 +25,8 @@ export const projects = [
   {
     name: 'AI Text-to-SQL System',
     kind: 'Final-year major project · FastAPI',
-    // add  embed: 'https://g52-web.vercel.app/',  once the site allows framing (it sends X-Frame-Options: DENY today)
+    // preview appears by itself once this site's headers allow framing (see TEXT_TO_SQL_PREVIEW.md)
+    embed: 'https://g52-web.vercel.app/',
     stack: ['Python', 'FastAPI', 'SQL', 'NLP', 'LLMs'],
     points: [
       'Turns plain-English questions into SQL so non-technical users can query a database without writing code.',
@@ -35,15 +36,30 @@ export const projects = [
     ],
     live: 'https://g52-web.vercel.app/',
   },
+  {
+    name: 'Plane+: Time Tracking & AI Search',
+    kind: 'Open-source extension · Django + React',
+    embed: 'https://prathamesh250205.github.io/plane-time-tracking-search/demo/',
+    stack: ['Python', 'Django', 'TypeScript', 'React', 'PostgreSQL', 'Docker', 'ONNX', 'Semantic search', 'GitHub Actions'],
+    points: [
+      'Extended Plane, a large open-source Jira alternative (Django + React monorepo), with per-task time tracking and a person × day timesheet.',
+      'New PostgreSQL tables and REST APIs with owner-only edits; timesheet totals by member, task and day are aggregated in SQL.',
+      'Self-hosted semantic search microservice (bge-small-en-v1.5 via ONNX): “the app feels sluggish” finds “slow dashboard”, and no data leaves the server.',
+      'Embeddings cached by content hash, so a search re-embeds only new or changed tasks, with no background jobs.',
+      '16 API contract tests with a fake embedder, and a GitHub Actions pipeline that builds the Docker image; deployed with Docker Compose.',
+    ],
+    live: 'https://prathamesh250205.github.io/plane-time-tracking-search/demo/',
+    code: 'https://github.com/Prathamesh250205/plane-time-tracking-search',
+  },
 ];
 
 export const skills = [
   { group: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'SQL'] },
   { group: 'Frontend', items: ['React', 'HTML', 'CSS', 'Framer Motion'] },
-  { group: 'Backend & APIs', items: ['Node.js', 'Express.js', 'FastAPI', 'REST', 'JWT', 'Google OAuth', 'Rate limiting'] },
-  { group: 'Databases', items: ['MongoDB', 'Atlas Vector Search', 'SQL'] },
+  { group: 'Backend & APIs', items: ['Node.js', 'Express.js', 'FastAPI', 'Django', 'REST', 'JWT', 'Google OAuth', 'Rate limiting'] },
+  { group: 'Databases', items: ['MongoDB', 'Atlas Vector Search', 'PostgreSQL', 'SQL'] },
   { group: 'AI & NLP', items: ['RAG', 'Gemini API', 'OCR', 'Text-to-SQL', 'Prompt engineering'] },
-  { group: 'DevOps & Tools', items: ['Git', 'GitHub', 'Docker', 'Vercel', 'LiteLLM', 'Razorpay'] },
+  { group: 'DevOps & Tools', items: ['Git', 'GitHub', 'GitHub Actions', 'Docker', 'Vercel', 'LiteLLM', 'Razorpay'] },
   { group: 'Data Analysis', items: ['Pandas', 'NumPy', 'Matplotlib', 'Scikit-learn', 'Tableau', 'Excel', 'Power BI'] },
 ];
 
