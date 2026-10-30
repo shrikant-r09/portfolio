@@ -12,6 +12,9 @@
   --accent: #ff6a1a; /* safety orange */
   --nav-bg: rgba(11, 12, 14, .8);
   --stripe: #17191d;
+  --glass: rgba(255, 255, 255, .04);
+  --glass-focus: rgba(255, 255, 255, .07);
+  --glass-edge: rgba(255, 255, 255, .1);
   color-scheme: dark;
   --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
   --sans: "Space Grotesk", system-ui, sans-serif;
@@ -26,6 +29,9 @@
   --accent: #d9530b;
   --nav-bg: rgba(244, 242, 238, .85);
   --stripe: #e2ded6;
+  --glass: rgba(255, 255, 255, .45);
+  --glass-focus: rgba(255, 255, 255, .7);
+  --glass-edge: rgba(255, 255, 255, .8);
   color-scheme: light;
 }
 body, .landing, .nav, .card, .shot, .marquee { transition: background-color .4s, color .4s, border-color .4s; }
@@ -148,7 +154,15 @@ main { padding: 0 clamp(16px, 6vw, 96px); }
 .project li { margin-bottom: .5rem; }
 .project li::marker { color: var(--accent); }
 .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.5rem; }
-.tags span { font: .72rem var(--mono); padding: .3rem .6rem; border: 1px solid var(--line); color: var(--muted); }
+.tags span {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font: .72rem var(--mono); padding: .3rem .6rem; border: 1px solid var(--line); color: var(--muted);
+  transition: color .2s, border-color .2s;
+}
+.tags span svg { width: 14px; height: 14px; flex: none; color: var(--accent); }
+.tags span:hover { color: var(--text); border-color: var(--accent); }
+.card .tags span { font-size: .78rem; padding: .4rem .7rem; }
+.card .tags span svg { width: 16px; height: 16px; }
 
 /* skills */
 .skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
@@ -176,13 +190,26 @@ main { padding: 0 clamp(16px, 6vw, 96px); }
 .contact-list span { width: 6rem; font: .75rem var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; padding-top: .2rem; }
 .contact-list a { text-decoration: none; transition: color .2s; }
 .contact-list a:hover { color: var(--accent); }
-.form { display: grid; gap: 1.2rem; }
+/* frosted glass: the moving dots show through, blurred */
+.form {
+  display: grid; gap: 1.2rem; padding: 1.8rem; border-radius: 18px;
+  background: var(--glass); border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .18), inset 0 1px 0 var(--glass-edge);
+}
 .form label { display: grid; gap: .4rem; font: .75rem var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
 .form input, .form textarea {
-  font: 1rem var(--sans); color: var(--text); background: var(--panel);
-  border: 1px solid var(--line); padding: .8rem; resize: vertical; transition: border-color .2s;
+  font: 1rem var(--sans); color: var(--text); border-radius: 10px; padding: .85rem 1rem; resize: vertical;
+  background: var(--glass); border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: border-color .2s, box-shadow .2s, background .2s;
 }
-.form input:focus, .form textarea:focus { outline: none; border-color: var(--accent); }
+.form input::placeholder, .form textarea::placeholder { color: var(--muted); opacity: .7; }
+.form input:focus, .form textarea:focus {
+  outline: none; border-color: var(--accent); background: var(--glass-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.form .btn { border-radius: 10px; }
 .form .btn { justify-self: start; }
 .form-msg { margin: 0; font: .85rem var(--mono); }
 .form-msg.sent { color: #3ddc84; }

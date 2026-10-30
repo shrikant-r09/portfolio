@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { contact, projects, skills, certs, leadership } from './data.js';
 import Particles from './Particles.jsx';
+import { iconFor } from './icons.js';
+
+function Tag({ name }) {
+  const Icon = iconFor(name);
+  return <span><Icon aria-hidden="true" />{name}</span>;
+}
 
 const ease = [0.22, 1, 0.36, 1];
 const reveal = {
@@ -161,7 +167,7 @@ function Project({ p, i }) {
       <div className="project-body">
         <h3>{p.name}</h3>
         <ul>{p.points.map(pt => <li key={pt}>{pt}</li>)}</ul>
-        <div className="tags">{p.stack.map(s => <span key={s}>{s}</span>)}</div>
+        <div className="tags">{p.stack.map(s => <Tag key={s} name={s} />)}</div>
         <div className="cta">
           <a className="btn" href={p.live} target="_blank" rel="noopener">Live demo ↗</a>
           {p.code && <a className="btn ghost" href={p.code} target="_blank" rel="noopener">Source ↗</a>}
@@ -193,9 +199,9 @@ function ContactForm() {
   }
   return (
     <motion.form className="form" onSubmit={submit} {...reveal}>
-      <label>Name<input name="name" required maxLength={100} autoComplete="name" /></label>
-      <label>Email<input name="email" type="email" required maxLength={200} autoComplete="email" /></label>
-      <label>Message<textarea name="message" rows={5} required maxLength={2000} /></label>
+      <label>Name<input name="name" required maxLength={100} autoComplete="name" placeholder="Your name" /></label>
+      <label>Email<input name="email" type="email" required maxLength={200} autoComplete="email" placeholder="you@company.com" /></label>
+      <label>Message<textarea name="message" rows={5} required maxLength={2000} placeholder="Tell me about the role or project…" /></label>
       <button className="btn" disabled={state.status === 'sending'}>
         {state.status === 'sending' ? 'Sending…' : 'Send message →'}
       </button>
@@ -253,7 +259,7 @@ function Site({ onHome }) {
               <motion.div className="card" key={s.group} {...reveal}
                 transition={{ ...reveal.transition, delay: i * 0.06 }} whileHover={{ y: -6 }}>
                 <h4>{s.group}</h4>
-                <div className="tags">{s.items.map(t => <span key={t}>{t}</span>)}</div>
+                <div className="tags">{s.items.map(t => <Tag key={t} name={t} />)}</div>
               </motion.div>
             ))}
           </div>
