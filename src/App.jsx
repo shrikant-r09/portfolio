@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { motion, AnimatePresence, useInView, useScroll, useSpring } from 'framer-motion';
 import { contact, projects, skills, certs, leadership } from './data.js';
 import Background from './Background.jsx';
 import { iconFor } from './icons.js';
@@ -32,6 +32,12 @@ const reveal = {
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: '-80px' },
   transition: { duration: 0.7, ease },
+};
+
+// blurred & ghosted → crisp (used by the bento cards and contact panels)
+const blurIn = {
+  hidden: { opacity: 0, scale: 0.94, filter: 'blur(14px)' },
+  show: { opacity: 1, scale: 1, filter: 'blur(0px)', transition: { duration: 0.8, ease } },
 };
 
 function Section({ id, index, title, scene, children }) {
@@ -213,16 +219,77 @@ function ContactForm() {
       setState({ status: 'error', msg: err.message });
     }
   }
+  const sent = state.status === 'sent';
+  const field = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } };
   return (
-    <motion.form className="form" onSubmit={submit} {...reveal}>
-      <label>Name<input name="name" required maxLength={100} autoComplete="name" placeholder="Your name" /></label>
-      <label>Email<input name="email" type="email" required maxLength={200} autoComplete="email" placeholder="you@company.com" /></label>
-      <label>Message<textarea name="message" rows={5} required maxLength={2000} placeholder="Tell me about the role or project…" /></label>
-      <button className="btn" disabled={state.status === 'sending'}>
-        {state.status === 'sending' ? 'Sending…' : 'Send message →'}
-      </button>
+    <motion.form className="form message-panel" onSubmit={submit} variants={blurIn}
+      initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
+      <motion.div className="message-head" variants={field}>
+        <h3>Contact me to build your next project</h3>
+        <p>Hiring for a full-stack or data role, or have a project in mind? I usually reply within a day.</p>
+      </motion.div>
+
+      {/* on success the fields fold away and the button slides up into a confirmation */}
+      <AnimatePresence initial={false}>
+        {!sent && (
+          <motion.div className="message-fields" key="fields"
+            variants={{ show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } } }}
+            exit={{ opacity: 0, height: 0, filter: 'blur(8px)', transition: { duration: 0.5, ease } }}>
+            <motion.label variants={field}>Name<input name="name" required maxLength={100} autoComplete="name" placeholder="Your name" /></motion.label>
+            <motion.label variants={field}>Email<input name="email" type="email" required maxLength={200} autoComplete="email" placeholder="you@company.com" /></motion.label>
+            <motion.label variants={field} className="wide">Message<textarea name="message" rows={5} required maxLength={2000} placeholder="Tell me about the role or project…" /></motion.label>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.button layout className={`btn submit ${sent ? 'done' : ''}`} variants={field}
+        type={sent ? 'button' : 'submit'} disabled={state.status === 'sending'}
+        onClick={sent ? () => setState({ status: 'idle', msg: '' }) : undefined}
+        whileTap={{ scale: 0.97 }} transition={{ layout: { duration: 0.5, ease } }}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span key={state.status} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }}>
+            {sent ? '✓ Message sent — send another?' : state.status === 'sending' ? 'Sending…' : 'Send message →'}
+          </motion.span>
+        </AnimatePresence>
+      </motion.button>
       {state.msg && <p className={`form-msg ${state.status}`} role="status">{state.msg}</p>}
     </motion.form>
+  );
+}
+
+// Tilted social pills that drop into the panel; drag them around for fun.
+const pills = [
+  { label: 'Hire me!', href: `mailto:${contact.email}?subject=Job%20opportunity`, x: 34, y: 8, r: -6 },
+  { label: '👋', x: 70, y: 6, r: 12 },
+  { label: 'GitHub', href: contact.github, x: 8, y: 34, r: 14 },
+  { label: 'LinkedIn', href: contact.linkedin, x: 48, y: 36, r: -4 },
+  { label: 'Email', href: `mailto:${contact.email}`, x: 14, y: 62, r: -10 },
+  { label: 'Résumé', href: '/Shrikant_Rathod_CV_FullStack.pdf', x: 44, y: 64, r: 8 },
+  { label: 'Call', href: `tel:${contact.phone.replace(/\s/g, '')}`, x: 74, y: 40, r: -14 },
+];
+
+function Pills() {
+  const box = useRef(null), dragged = useRef(false);
+  const inView = useInView(box, { once: true, margin: '-60px' });
+  return (
+    <motion.div className="pills" ref={box} variants={blurIn}>
+      {pills.map((p, i) => (
+        <motion.a key={p.label} className="social-pill" href={p.href}
+          target={p.href?.startsWith('http') ? '_blank' : undefined} rel="noopener"
+          style={{ left: `${p.x}%`, top: `${p.y}%` }}
+          // watch the panel, not the pill: pills start clipped above it, so their own whileInView never fires
+          initial="hidden" animate={inView ? 'show' : 'hidden'}
+          variants={{
+            hidden: { y: -320, rotate: 0, opacity: 0 },
+            show: { y: 0, rotate: p.r, opacity: 1, transition: { type: 'spring', stiffness: 160, damping: 13, delay: 0.4 + i * 0.09 } },
+          }}
+          drag dragConstraints={box} dragElastic={0.2} whileDrag={{ scale: 1.08, zIndex: 5 }}
+          onDragStart={() => { dragged.current = true; }}
+          onClick={e => { if (dragged.current || !p.href) e.preventDefault(); dragged.current = false; }}>
+          {p.label}
+        </motion.a>
+      ))}
+    </motion.div>
   );
 }
 
@@ -274,15 +341,22 @@ function Site({ onHome }) {
             <LogoRow items={featured} />
             <LogoRow items={featured2} reverse />
           </motion.div>
-          <div className="skills">
-            {skills.map((s, i) => (
-              <motion.div className="card" key={s.group} {...reveal}
-                transition={{ ...reveal.transition, delay: i * 0.06 }} whileHover={{ y: -6 }}>
+          {/* bento grid: cards fade in from a soft blur, one after another */}
+          <motion.div className="bento" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-100px' }}
+            variants={{ show: { transition: { staggerChildren: 0.12 } } }}>
+            <motion.div className="card bento-intro" variants={blurIn}>
+              <h3>Wanna see<br />my toolkit?</h3>
+              <p>The languages, frameworks and tools I use to ship production apps.</p>
+              <a className="btn pill small" href="#contact">Let’s talk →</a>
+            </motion.div>
+            {skills.map(s => (
+              <motion.div className="card" key={s.group} variants={blurIn}
+                whileHover={{ y: -6, transition: { duration: 0.25 } }}>
                 <h4>{s.group}</h4>
                 <div className="tags">{s.items.map(t => <Tag key={t} name={t} />)}</div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </Section>
 
         <Section id="about" index="03" title="About & credentials" scene="torus">
@@ -307,16 +381,19 @@ function Site({ onHome }) {
         </Section>
 
         <Section id="contact" index="04" title="Let’s build something" scene="stars">
-          <div className="contact">
-            <motion.ul className="contact-list" {...reveal}>
-              <li><span>Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
-              <li><span>Phone</span><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></li>
-              <li><span>LinkedIn</span><a href={contact.linkedin} target="_blank" rel="noopener">shrikant-rathod</a></li>
-              <li><span>GitHub</span><a href={contact.github} target="_blank" rel="noopener">shrikant-r09</a></li>
-              <li><span>Based in</span>{contact.location}</li>
-            </motion.ul>
-            <ContactForm />
-          </div>
+          <ContactForm />
+          <motion.div className="connect" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}
+            variants={{ show: { transition: { staggerChildren: 0.15 } } }}>
+            <motion.div className="card connect-card" variants={blurIn}>
+              <h3>Let’s connect<br />and chat</h3>
+              <ul className="contact-list">
+                <li><span>Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+                <li><span>Phone</span><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></li>
+                <li><span>Based in</span>{contact.location}</li>
+              </ul>
+            </motion.div>
+            <Pills />
+          </motion.div>
         </Section>
       </main>
       <footer>© 2026 Shrikant Rathod · Built with MongoDB, Express, React &amp; Node</footer>
