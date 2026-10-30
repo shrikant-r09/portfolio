@@ -10,7 +10,7 @@ export const projects = [
   {
     name: 'StudyMate AI',
     kind: 'AI-powered study assistant · MERN',
-    image: '/img/studymate.png',
+    embed: 'https://studymate-ai-tutor.vercel.app/', // live landing page shown in the card (site allows framing)
     stack: ['React', 'Node.js', 'Express', 'MongoDB', 'Gemini', 'Atlas Vector Search', 'Docker', 'LiteLLM', 'Razorpay'],
     points: [
       'RAG tutor that answers only from a student’s own notes and cites the source page — Gemini embeddings + Atlas Vector Search.',
@@ -25,7 +25,6 @@ export const projects = [
   {
     name: 'AI Text-to-SQL System',
     kind: 'Final-year major project · FastAPI',
-    image: '/img/text-to-sql.png',
     stack: ['Python', 'FastAPI', 'SQL', 'NLP', 'LLMs'],
     points: [
       'Turns plain-English questions into SQL so non-technical users can query a database without writing code.',

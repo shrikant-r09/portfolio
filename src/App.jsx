@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { contact, projects, skills, certs, leadership } from './data.js';
-import Particles from './Particles.jsx';
+import Background from './Background.jsx';
 import { iconFor } from './icons.js';
 
 function Tag({ name }) {
@@ -104,9 +104,6 @@ function Landing({ onEnter }) {
   return (
     <motion.header className="landing" key="landing" data-scene="galaxy"
       exit={{ y: '-100%', transition: { duration: 0.9, ease } }}>
-      <div className="grid-bg" />
-      <motion.div className="glow" animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
       <div className="landing-top">
         <span className="brand">SR<span>/</span>DEV</span>
         <span className="status"><span className="dot" /> Open to work</span>
@@ -157,18 +154,32 @@ function Landing({ onEnter }) {
   );
 }
 
-function Project({ p, i }) {
-  const [noImg, setNoImg] = useState(false);
+// Live, scaled-down view of the deployed site in a browser frame. Click opens the real site.
+function LivePreview({ p }) {
   return (
-    <motion.article className="project" {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
+    <motion.a className="live" href={p.live} target="_blank" rel="noopener"
+      whileHover={{ y: -6 }} transition={{ duration: 0.4, ease }} aria-label={`Open ${p.name} live`}>
+      <div className="live-bar">
+        <i /><i /><i />
+        <span>{p.embed.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+        <b className="live-badge">● Live</b>
+      </div>
+      <div className="live-view">
+        <iframe src={p.embed} title={`${p.name} live preview`} loading="lazy" tabIndex={-1} scrolling="no" />
+        <span className="live-open">Open live site ↗</span>
+      </div>
+    </motion.a>
+  );
+}
+
+function Project({ p, i }) {
+  return (
+    <motion.article className={`project ${p.embed ? '' : 'solo'}`} {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
       <div className="project-meta">
         <span className="idx">P-{String(i + 1).padStart(2, '0')}</span>
         <span>{p.kind}</span>
       </div>
-      <motion.div className={`shot ${noImg ? 'empty' : ''}`} whileHover={{ scale: 1.02 }} transition={{ duration: 0.4, ease }}>
-        {noImg ? <span>// screenshot coming soon</span>
-          : <img src={p.image} alt={`${p.name} screenshot`} onError={() => setNoImg(true)} loading="lazy" />}
-      </motion.div>
+      {p.embed && <LivePreview p={p} />}
       <div className="project-body">
         <h3>{p.name}</h3>
         <ul>{p.points.map(pt => <li key={pt}>{pt}</li>)}</ul>
@@ -220,7 +231,7 @@ export default function App() {
   const enter = () => { setEntered(true); scrollTo(0, 0); };
   return (
     <>
-      <Particles />
+      <Background />
       <ThemeToggle />
       <div className="relative z-10">
         <AnimatePresence mode="wait">
