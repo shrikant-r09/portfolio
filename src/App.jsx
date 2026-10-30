@@ -167,7 +167,7 @@ function LivePreview({ p }) {
       whileHover={{ y: -6 }} transition={{ duration: 0.4, ease }} aria-label={`Open ${p.name} live`}>
       <div className="live-bar">
         <i /><i /><i />
-        <span>{p.embed.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+        <span>{(p.embed || p.live).replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
         <b className="live-badge">● Live</b>
       </div>
       <div className="live-view">

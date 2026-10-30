@@ -25,6 +25,7 @@ export const projects = [
   {
     name: 'AI Text-to-SQL System',
     kind: 'Final-year major project · FastAPI',
+    // add  embed: 'https://g52-web.vercel.app/',  once the site allows framing (it sends X-Frame-Options: DENY today)
     stack: ['Python', 'FastAPI', 'SQL', 'NLP', 'LLMs'],
     points: [
       'Turns plain-English questions into SQL so non-technical users can query a database without writing code.',

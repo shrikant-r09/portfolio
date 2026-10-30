@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
 
-// Blurred aurora glows + film grain, recolored per [data-scene] section,
-// with a glass lens that follows the cursor.
+// Blurred aurora glows + film grain, recolored per [data-scene] section.
 const palettes = {
   galaxy: ['#1d4ed8', '#1e3a8a', '#6d28d9', '#0f172a'],
   sphere: ['#7c3aed', '#2563eb', '#db2777', '#1e1b4b'],
@@ -30,21 +28,6 @@ function useScene() {
   return scene;
 }
 
-function Lens() {
-  const x = useMotionValue(-200), y = useMotionValue(-200);
-  const sx = useSpring(x, { stiffness: 220, damping: 24 }), sy = useSpring(y, { stiffness: 220, damping: 24 });
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (!matchMedia('(pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const move = e => { x.set(e.clientX - 60); y.set(e.clientY - 60); setOn(true); };
-    const leave = () => setOn(false);
-    addEventListener('pointermove', move);
-    document.addEventListener('pointerleave', leave);
-    return () => { removeEventListener('pointermove', move); document.removeEventListener('pointerleave', leave); };
-  }, [x, y]);
-  return <motion.div className="lens" aria-hidden="true" style={{ x: sx, y: sy, opacity: on ? 1 : 0 }} />;
-}
-
 export default function Background() {
   const colors = palettes[useScene()] || palettes.galaxy;
   return (
@@ -53,7 +36,6 @@ export default function Background() {
         {colors.map((c, i) => <div key={i} className={`blob b${i}`} style={{ backgroundColor: c }} />)}
       </div>
       <div className="grain" aria-hidden="true" />
-      <Lens />
     </>
   );
 }
