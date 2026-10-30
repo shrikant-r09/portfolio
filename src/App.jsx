@@ -24,7 +24,7 @@ function LogoRow({ items, reverse }) {
 }
 
 const featured = ['React', 'Node.js', 'Express.js', 'MongoDB', 'TypeScript', 'JavaScript', 'Python', 'FastAPI', 'Docker', 'Git'];
-const featured2 = ['Gemini API', 'GitHub', 'Vercel', 'Razorpay', 'JWT', 'Google OAuth', 'HTML', 'CSS', 'Pandas', 'NumPy', 'Scikit-learn'];
+const featured2 = ['Gemini API', 'Claude', 'GitHub', 'Vercel', 'Razorpay', 'JWT', 'Google OAuth', 'HTML', 'CSS', 'Pandas', 'NumPy', 'Scikit-learn'];
 
 const ease = [0.22, 1, 0.36, 1];
 const reveal = {

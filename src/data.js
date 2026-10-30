@@ -58,7 +58,7 @@ export const skills = [
   { group: 'Frontend', items: ['React', 'HTML', 'CSS', 'Framer Motion'] },
   { group: 'Backend & APIs', items: ['Node.js', 'Express.js', 'FastAPI', 'Django', 'REST', 'JWT', 'Google OAuth', 'Rate limiting'] },
   { group: 'Databases', items: ['MongoDB', 'Atlas Vector Search', 'PostgreSQL', 'SQL'] },
-  { group: 'AI & NLP', items: ['RAG', 'Gemini API', 'OCR', 'Text-to-SQL', 'Prompt engineering'] },
+  { group: 'AI & NLP', items: ['RAG', 'Gemini API', 'Claude', 'OCR', 'Text-to-SQL', 'Prompt engineering'] },
   { group: 'DevOps & Tools', items: ['Git', 'GitHub', 'GitHub Actions', 'Docker', 'Vercel', 'LiteLLM', 'Razorpay'] },
   { group: 'Data Analysis', items: ['Pandas', 'NumPy', 'Matplotlib', 'Scikit-learn', 'Tableau', 'Excel', 'Power BI'] },
 ];

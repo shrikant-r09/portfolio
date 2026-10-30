@@ -2,7 +2,7 @@ import {
   SiJavascript, SiTypescript, SiPython, SiReact, SiHtml5, SiCss, SiFramer, SiNodedotjs, SiExpress,
   SiFastapi, SiJsonwebtokens, SiGoogle, SiMongodb, SiGooglegemini, SiGit, SiGithub, SiDocker,
   SiVercel, SiRazorpay, SiPandas, SiNumpy, SiScikitlearn, SiFlutter, SiDart, SiMysql,
-  SiDjango, SiPostgresql, SiOnnx, SiGithubactions,
+  SiDjango, SiPostgresql, SiOnnx, SiGithubactions, SiClaude,
 } from 'react-icons/si';
 import {
   TbApi, TbGauge, TbDatabaseSearch, TbBrain, TbScan, TbMessageCode, TbPlugConnected,
@@ -18,7 +18,7 @@ const icons = {
   'Node.js': [SiNodedotjs, '#5FA04E'], 'Express.js': [SiExpress, null], Express: [SiExpress, null], FastAPI: [SiFastapi, '#009688'],
   REST: [TbApi, '#FF6C37'], JWT: [SiJsonwebtokens, '#FB015B'], 'Google OAuth': [SiGoogle, '#4285F4'], 'Rate limiting': [TbGauge, '#F59E0B'],
   MongoDB: [SiMongodb, '#47A248'], 'Atlas Vector Search': [TbDatabaseSearch, '#00ED64'],
-  RAG: [TbBrain, '#A78BFA'], 'Gemini API': [SiGooglegemini, '#8E75B2'], Gemini: [SiGooglegemini, '#8E75B2'], OCR: [TbScan, '#38BDF8'],
+  RAG: [TbBrain, '#A78BFA'], 'Gemini API': [SiGooglegemini, '#8E75B2'], Claude: [SiClaude, '#D97757'], Gemini: [SiGooglegemini, '#8E75B2'], OCR: [TbScan, '#38BDF8'],
   'Text-to-SQL': [SiMysql, '#4479A1'], 'Prompt engineering': [TbMessageCode, '#F472B6'], NLP: [TbLanguage, '#34D399'], LLMs: [TbBrain, '#A78BFA'],
   Git: [SiGit, '#F05032'], GitHub: [SiGithub, null], Docker: [SiDocker, '#2496ED'], Vercel: [SiVercel, null],
   LiteLLM: [TbPlugConnected, '#22D3EE'], Razorpay: [SiRazorpay, '#3395FF'],
