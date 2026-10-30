@@ -1,6 +1,41 @@
 import { useEffect, useRef } from 'react';
 
-// Full-page drifting dots, linked when close, attracted to the cursor.
+// 3D point cloud that morphs into a new shape for whichever [data-scene] element
+// is in the middle of the screen, tilts toward the mouse, and uses the theme gradient.
+const N = 1400;
+const rand = (a = 1) => (Math.random() * 2 - 1) * a;
+
+const shapes = {
+  galaxy: i => {
+    const r = Math.sqrt(Math.random()) * 1.5, arm = (i % 3) * (Math.PI * 2 / 3), a = arm + r * 3.2 + rand(0.35);
+    return [Math.cos(a) * r, rand(0.08) * (1.6 - r), Math.sin(a) * r];
+  },
+  sphere: i => {
+    const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), a = i * 2.39996;
+    return [Math.cos(a) * r * 1.1, y * 1.1, Math.sin(a) * r * 1.1];
+  },
+  wave: i => {
+    const cols = 50, x = (i % cols) / (cols - 1) * 3.4 - 1.7, z = Math.floor(i / cols) / (N / cols) * 2.4 - 1.2;
+    return [x, 0, z]; // y is animated each frame
+  },
+  helix: i => {
+    const t = (i / N) * 2.8 - 1.4, a = t * 7 + (i % 2) * Math.PI, rung = i % 9 === 0;
+    const r = rung ? rand(0.6) : 0.6;
+    return [Math.cos(a) * r + rand(0.03), t, Math.sin(a) * r + rand(0.03)];
+  },
+  torus: () => {
+    const u = Math.random() * Math.PI * 2, v = Math.random() * Math.PI * 2;
+    return [(1 + 0.35 * Math.cos(v)) * Math.cos(u), 0.35 * Math.sin(v), (1 + 0.35 * Math.cos(v)) * Math.sin(u)];
+  },
+  stars: () => [rand(2.2), rand(1.4), rand(1.6)],
+};
+const targets = Object.fromEntries(Object.entries(shapes).map(([k, f]) => [k, Array.from({ length: N }, (_, i) => f(i))]));
+
+// camera tilt (radians around X) per shape, so each reads best
+const viewTilt = { galaxy: 1.0, wave: 0.5, sphere: 0.25, helix: 0.15, torus: 0.9, stars: 0.1 };
+
+const hex = h => [1, 3, 5].map(o => parseInt(h.slice(o, o + 2), 16));
+
 export default function Particles() {
   const ref = useRef(null);
 
@@ -8,80 +43,77 @@ export default function Particles() {
     const canvas = ref.current;
     const ctx = canvas.getContext('2d');
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const mouse = { x: -9999, y: -9999 };
-    const LINK = 120, REACH = 180;
-    let dots = [], w, h, raf;
+    const pts = targets.galaxy.map(([x, y, z]) => ({ x: x * 3, y: y * 3, z: z * 3 })); // start exploded, fly in
+    const mouse = { x: 0, y: 0 }, tilt = { x: 0, y: 0 };
+    let scene = 'galaxy', w, h, raf, frame = 0, rotY = 0, baseTilt = viewTilt.galaxy, palette = [];
 
     function resize() {
       const dpr = Math.min(devicePixelRatio || 1, 2);
       w = innerWidth; h = innerHeight;
       canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // ponytail: O(n²) linking, capped at 140 dots; use a spatial grid if you raise the cap
-      const n = Math.min(140, Math.round((w * h) / 9000));
-      dots = Array.from({ length: n }, () => ({
-        x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
-        r: Math.random() * 1.6 + 0.6,
-      }));
     }
 
-    function frame() {
+    function readTheme() {
       const css = getComputedStyle(document.documentElement);
-      const dot = css.getPropertyValue('--muted').trim();
-      const accent = css.getPropertyValue('--accent').trim();
+      const a = hex(css.getPropertyValue('--accent').trim()), b = hex(css.getPropertyValue('--accent-2').trim());
+      palette = Array.from({ length: 12 }, (_, k) => `rgb(${a.map((v, j) => Math.round(v + (b[j] - v) * k / 11)).join(',')})`);
+    }
+
+    function pickScene() {
+      const mid = h * 0.5;
+      for (const el of document.querySelectorAll('[data-scene]')) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= mid && r.bottom >= mid) { scene = el.dataset.scene; return; }
+      }
+    }
+
+    function draw() {
+      frame++;
+      if (frame % 15 === 1) { pickScene(); readTheme(); }
+      const t = frame / 60, target = targets[scene] || targets.galaxy, ease = still ? 1 : 0.04;
+      if (!still) {
+        rotY += scene === 'wave' ? 0.0008 : 0.0025;
+        tilt.x += (mouse.y * 0.35 - tilt.x) * 0.05;
+        tilt.y += (mouse.x * 0.6 - tilt.y) * 0.05;
+      }
+      baseTilt += ((viewTilt[scene] ?? 0.25) - baseTilt) * (still ? 1 : 0.03);
+      const ay = rotY + tilt.y, ax = baseTilt + tilt.x;
+      const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+      const scale = Math.min(w, h) * 0.42, cam = 3.4;
       ctx.clearRect(0, 0, w, h);
 
-      for (const d of dots) {
-        if (!still) {
-          const dx = mouse.x - d.x, dy = mouse.y - d.y, dist = Math.hypot(dx, dy);
-          if (dist < REACH) { d.vx += dx / dist * 0.02; d.vy += dy / dist * 0.02; }
-          const speed = Math.hypot(d.vx, d.vy);
-          if (speed > 1.2) { d.vx *= 1.2 / speed; d.vy *= 1.2 / speed; }
-          else if (speed > 0.3) { d.vx *= 0.99; d.vy *= 0.99; } // ease back to a slow drift
-          d.x += d.vx; d.y += d.vy;
-          if (d.x < 0 || d.x > w) d.vx *= -1;
-          if (d.y < 0 || d.y > h) d.vy *= -1;
-        }
-        ctx.globalAlpha = 0.7;
-        ctx.fillStyle = dot;
-        ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
-      }
+      for (let i = 0; i < N; i++) {
+        const p = pts[i], [tx, ty0, tz] = target[i];
+        const ty = scene === 'wave' && !still ? Math.sin(tx * 2.2 + t * 1.4) * 0.18 + Math.cos(tz * 2.6 + t) * 0.12 : ty0;
+        p.x += (tx - p.x) * ease; p.y += (ty - p.y) * ease; p.z += (tz - p.z) * ease;
 
-      ctx.lineWidth = 0.6;
-      for (let i = 0; i < dots.length; i++) {
-        const a = dots[i];
-        for (let j = i + 1; j < dots.length; j++) {
-          const b = dots[j], dist = Math.hypot(a.x - b.x, a.y - b.y);
-          if (dist < LINK) {
-            ctx.globalAlpha = (1 - dist / LINK) * 0.35;
-            ctx.strokeStyle = dot;
-            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-          }
-        }
-        const md = Math.hypot(a.x - mouse.x, a.y - mouse.y);
-        if (md < REACH) {
-          ctx.globalAlpha = (1 - md / REACH) * 0.6;
-          ctx.strokeStyle = accent;
-          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
-        }
+        // rotate around Y, then X
+        const x1 = p.x * cy - p.z * sy, z1 = p.x * sy + p.z * cy;
+        const y2 = p.y * cx - z1 * sx, z2 = p.y * sx + z1 * cx;
+        const k = cam / (cam + z2);
+        if (k <= 0) continue;
+        const px = w / 2 + x1 * scale * k, py = h / 2 + y2 * scale * k;
+        if (px < -10 || px > w + 10 || py < -10 || py > h + 10) continue;
+
+        const depth = Math.min(1, Math.max(0, (k - 0.6) / 0.9));
+        ctx.globalAlpha = 0.3 + depth * 0.7;
+        ctx.fillStyle = palette[Math.min(11, Math.max(0, Math.floor(px / w * 12)))];
+        const s = 1 + depth * 2.2;
+        ctx.fillRect(px - s / 2, py - s / 2, s, s);
       }
       ctx.globalAlpha = 1;
-      if (!still) raf = requestAnimationFrame(frame);
+      raf = requestAnimationFrame(draw);
     }
 
-    const move = e => { mouse.x = e.clientX; mouse.y = e.clientY; };
-    const leave = () => { mouse.x = mouse.y = -9999; };
-    const onResize = () => { resize(); if (still) frame(); };
-    resize(); frame();
-    addEventListener('resize', onResize);
+    const move = e => { mouse.x = e.clientX / w - 0.5; mouse.y = e.clientY / h - 0.5; };
+    resize(); readTheme(); draw();
+    addEventListener('resize', resize);
     addEventListener('pointermove', move);
-    document.addEventListener('pointerleave', leave);
     return () => {
       cancelAnimationFrame(raf);
-      removeEventListener('resize', onResize);
+      removeEventListener('resize', resize);
       removeEventListener('pointermove', move);
-      document.removeEventListener('pointerleave', leave);
     };
   }, []);
 

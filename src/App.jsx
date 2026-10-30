@@ -5,9 +5,26 @@ import Particles from './Particles.jsx';
 import { iconFor } from './icons.js';
 
 function Tag({ name }) {
-  const Icon = iconFor(name);
-  return <span><Icon aria-hidden="true" />{name}</span>;
+  const [Icon, color] = iconFor(name);
+  return <span><Icon aria-hidden="true" style={color ? { color } : undefined} />{name}</span>;
 }
+
+// Endless row of brand-colored logo chips; pauses on hover.
+function LogoRow({ items, reverse }) {
+  return (
+    <div className="logo-row" aria-hidden="true">
+      <div className={`logo-track ${reverse ? 'reverse' : ''}`}>
+        {[...items, ...items].map((t, i) => {
+          const [Icon, color] = iconFor(t);
+          return <span className="logo-chip" key={i}><Icon style={color ? { color } : undefined} />{t}</span>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+const featured = ['React', 'Node.js', 'Express.js', 'MongoDB', 'TypeScript', 'JavaScript', 'Python', 'FastAPI', 'Docker', 'Git'];
+const featured2 = ['Gemini API', 'GitHub', 'Vercel', 'Razorpay', 'JWT', 'Google OAuth', 'HTML', 'CSS', 'Pandas', 'NumPy', 'Scikit-learn'];
 
 const ease = [0.22, 1, 0.36, 1];
 const reveal = {
@@ -17,9 +34,9 @@ const reveal = {
   transition: { duration: 0.7, ease },
 };
 
-function Section({ id, index, title, children }) {
+function Section({ id, index, title, scene, children }) {
   return (
-    <section id={id} className="section">
+    <section id={id} className="section" data-scene={scene}>
       <motion.header className="section-head" {...reveal}>
         <span className="idx">{index}</span>
         <h2>{title}</h2>
@@ -85,7 +102,7 @@ function ThemeToggle() {
 function Landing({ onEnter }) {
   const words = ['I', 'build', 'complete', 'web', 'products'];
   return (
-    <motion.header className="landing" key="landing"
+    <motion.header className="landing" key="landing" data-scene="galaxy"
       exit={{ y: '-100%', transition: { duration: 0.9, ease } }}>
       <div className="grid-bg" />
       <motion.div className="glow" animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
@@ -137,18 +154,6 @@ function Landing({ onEnter }) {
         <span>Web Developer · Full-Stack · Data Analyst</span>
       </div>
     </motion.header>
-  );
-}
-
-function Marquee() {
-  const items = skills.slice(0, 6).flatMap(s => s.items);
-  return (
-    <div className="marquee" aria-hidden="true">
-      <motion.div className="track" animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 40, ease: 'linear', repeat: Infinity }}>
-        {[...items, ...items].map((t, i) => <span key={i}>{t} <i>✦</i></span>)}
-      </motion.div>
-    </div>
   );
 }
 
@@ -232,7 +237,7 @@ function Site({ onHome }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.5 } }}
       exit={{ opacity: 0, transition: { duration: 0.3 } }}>
       <Nav onHome={onHome} />
-      <section className="intro">
+      <section className="intro" data-scene="sphere">
         <motion.p className="eyebrow" {...reveal}>// who I am</motion.p>
         <motion.h2 {...reveal} transition={{ ...reveal.transition, delay: 0.1 }}>
           Full-stack developer who <em>ships.</em>
@@ -247,13 +252,17 @@ function Site({ onHome }) {
           <a className="btn ghost" href="/Shrikant_Rathod_CV_DataAnalyst.pdf" download>CV — Data Analyst ↓</a>
         </motion.div>
       </section>
-      <Marquee />
+      <div className="marquee"><LogoRow items={featured} /></div>
       <main>
-        <Section id="work" index="01" title="Selected work">
+        <Section id="work" index="01" title="Selected work" scene="wave">
           <div className="projects">{projects.map((p, i) => <Project key={p.name} p={p} i={i} />)}</div>
         </Section>
 
-        <Section id="stack" index="02" title="Tech stack">
+        <Section id="stack" index="02" title="Tech stack" scene="helix">
+          <motion.div className="logo-rows" {...reveal}>
+            <LogoRow items={featured} />
+            <LogoRow items={featured2} reverse />
+          </motion.div>
           <div className="skills">
             {skills.map((s, i) => (
               <motion.div className="card" key={s.group} {...reveal}
@@ -265,7 +274,7 @@ function Site({ onHome }) {
           </div>
         </Section>
 
-        <Section id="about" index="03" title="About & credentials">
+        <Section id="about" index="03" title="About & credentials" scene="torus">
           <div className="about">
             <motion.div {...reveal}>
               <p>B.Tech Computer Science (Major) with a Data Science minor at D. Y. Patil College of
@@ -286,7 +295,7 @@ function Site({ onHome }) {
           </div>
         </Section>
 
-        <Section id="contact" index="04" title="Let’s build something">
+        <Section id="contact" index="04" title="Let’s build something" scene="stars">
           <div className="contact">
             <motion.ul className="contact-list" {...reveal}>
               <li><span>Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
